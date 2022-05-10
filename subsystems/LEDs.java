@@ -2,28 +2,36 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.extra.led;
 import java.lang.Thread;
-import frc.robot.RobotContainer;
-
-
 
 public class LEDs extends SubsystemBase{
-    private AddressableLEDBuffer buffer;
-    private AddressableLED lights;
-    private Joystick stick;
+    private static AddressableLEDBuffer buffer;
+    private static AddressableLED lights;
 
     public LEDs(){
         lights = new AddressableLED(5);
         buffer = new AddressableLEDBuffer(60);
         lights.setLength(buffer.getLength());
-        led.changeColor(lights, buffer, Constants.green);
+        lights.start();
     }
-    private void rainbow(){
+
+    public static void changeColor(led LED){
+      for(int i = 0; i < buffer.getLength(); i++){
+          buffer.setRGB(i, LED.getR(), LED.getG(), LED.getB());
+          lights.setData(buffer);
+      }
+  }
+
+    public static void turnOff(AddressableLED lights, AddressableLEDBuffer buffer){
+      for(int i = 0; i < buffer.getLength(); i++){
+          buffer.setRGB(i, 0, 0, 0);
+      }
+  }
+
+    public static void rainbow(){
         var m_rainbowFirstPixelHue = 1;
         for(var i = 0; i < buffer.getLength(); i++){
           final var hue = (m_rainbowFirstPixelHue + (i * 180 / buffer.getLength())) % 180;
@@ -34,28 +42,9 @@ public class LEDs extends SubsystemBase{
         m_rainbowFirstPixelHue %= 180;
         lights.setData(buffer);
       }
-    private void setLed(){
-        if(stick.getRawButtonPressed(1)){
-          led.changeColor(lights, buffer, Constants.red);
-        }
-        else if(stick.getRawButtonPressed(2)){
-          led.changeColor(lights, buffer, Constants.orange);
-        }
-        else if(stick.getRawButtonPressed(3)){
-          led.changeColor(lights, buffer, Constants.yellow);
-        }
-        else if(stick.getRawButtonPressed(4)){
-          led.changeColor(lights, buffer, Constants.green);
-        }
-        else if(stick.getRawButtonPressed(5)){
-          led.changeColor(lights, buffer, Constants.blue);
-        }
-        else if(stick.getRawButtonPressed(6)){
-          led.changeColor(lights, buffer, Constants.purple);
-        }
-        else if(stick.getRawButtonPressed(7)){
-          //wave effect
-            led.turnOff(lights, buffer);
+
+      public static void wave(){
+        turnOff(lights, buffer);
             try{
               for(int i = 0; i < buffer.getLength(); i++){
               if(i % 6 == 0){  
@@ -111,11 +100,6 @@ public class LEDs extends SubsystemBase{
             catch(Exception e){
               System.out.print(e);
             }
-    
-          }
-        else if(stick.getRawButtonPressed(8)){
-          rainbow();
-        }
       }
 
     @Override
