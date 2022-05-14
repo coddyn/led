@@ -5,14 +5,19 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Joystick;
+//import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.commands.ExampleCommand;
-import frc.robot.commands.setLED;
+//import frc.robot.controller.XBoxController;
+import frc.robot.controller.buttonSetter;
 import frc.robot.subsystems.*;
+import frc.robot.util.assignedButtons;
+//import frc.robot.util.allButtons;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.Button;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+//  import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.color_commands.*;
+
+
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -21,17 +26,19 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+  private final setRainbow auto = new setRainbow();
 
-  private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
-  private Joystick stick = new Joystick(0);
-
-  public static final LEDs LED = new LEDs();
+  public static final LED_Controller LIGHTS = new LED_Controller();
+  public static final assignedButtons LED_BUTTONS = new assignedButtons();
+  private final XboxController controller = new XboxController(1);
+  private final buttonSetter setter = new buttonSetter(controller);
+  
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
+    CommandScheduler.getInstance().registerSubsystem(LIGHTS);
   }
 
   /**
@@ -41,8 +48,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    Button b = new JoystickButton(stick, 1);
-    b.whenPressed(new setLED(LED));
+    setter.setButtons();
   }
 
   /**
@@ -52,6 +58,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return m_autoCommand;
+    return auto;
   }
 }
